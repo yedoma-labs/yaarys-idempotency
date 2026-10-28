@@ -1,6 +1,6 @@
 {
 	"name": "@yedoma-labs/yaarys-idempotency",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Framework-agnostic idempotency keys for POST requests with pluggable stores, in-flight locking and clear errors",
 	"type": "module",
 	"main": "./dist/index.cjs",
