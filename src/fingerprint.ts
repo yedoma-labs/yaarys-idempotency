@@ -12,6 +12,27 @@ function toHex(bytes: Uint8Array): string {
 }
 
 /**
+ * Returns the exact bytes of a body. Views (DataView, typed arrays) are read by their own
+ * offset and length, not by the whole underlying buffer. Other types are rejected, because
+ * hashing them as "no bytes" would let different requests share one fingerprint.
+ */
+function bodyBytes(body: FingerprintInput["body"]): Uint8Array {
+	if (body === undefined || body === null) {
+		return new Uint8Array(0);
+	}
+	if (typeof body === "string") {
+		return encoder.encode(body);
+	}
+	if (ArrayBuffer.isView(body)) {
+		return new Uint8Array(body.buffer, body.byteOffset, body.byteLength);
+	}
+	if (body instanceof ArrayBuffer) {
+		return new Uint8Array(body);
+	}
+	throw new TypeError("fingerprintRequest: body must be a string, Uint8Array or ArrayBuffer");
+}
+
+/**
  * Computes a SHA-256 fingerprint (hex) of an HTTP request.
  *
  * The method is upper-cased. Method and path are JSON-encoded and the body is length-prefixed,
@@ -26,8 +47,7 @@ export async function fingerprintRequest(input: FingerprintInput): Promise<strin
 		throw new TypeError("fingerprintRequest: path must be a string");
 	}
 
-	const body =
-		typeof input.body === "string" ? encoder.encode(input.body) : (input.body ?? new Uint8Array(0));
+	const body = bodyBytes(input.body);
 	const header = encoder.encode(
 		`${JSON.stringify([input.method.toUpperCase(), input.path])}\n${body.byteLength}\n`,
 	);

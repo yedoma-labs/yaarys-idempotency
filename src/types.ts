@@ -58,5 +58,5 @@ export interface Idempotency {
 export interface FingerprintInput {
 	method: string;
 	path: string;
-	body?: string | Uint8Array;
+	body?: string | Uint8Array | ArrayBuffer;
 }

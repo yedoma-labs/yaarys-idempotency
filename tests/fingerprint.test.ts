@@ -46,6 +46,41 @@ describe("fingerprintRequest", () => {
 		expect(bytes).toBe(text);
 	});
 
+	it("hashes an ArrayBuffer body by its content, not only its length", async () => {
+		const encode = (text: string) => new TextEncoder().encode(text).buffer;
+		const one = await fingerprintRequest({
+			method: "POST",
+			path: "/a",
+			body: encode('{"amount":1}'),
+		});
+		const two = await fingerprintRequest({
+			method: "POST",
+			path: "/a",
+			body: encode('{"amount":2}'),
+		});
+		expect(one).not.toBe(two);
+		expect(one).toBe(
+			await fingerprintRequest({ method: "POST", path: "/a", body: '{"amount":1}' }),
+		);
+	});
+
+	it("reads a view body by its own offset and length", async () => {
+		const bytes = new TextEncoder().encode('xx{"a":1}yy');
+		const view = bytes.subarray(2, 9);
+		const direct = await fingerprintRequest({ method: "POST", path: "/a", body: '{"a":1}' });
+		expect(await fingerprintRequest({ method: "POST", path: "/a", body: view })).toBe(direct);
+		const dataView = new DataView(bytes.buffer, 2, 7);
+		expect(await fingerprintRequest({ method: "POST", path: "/a", body: dataView as never })).toBe(
+			direct,
+		);
+	});
+
+	it("rejects a body that is not a string or binary data", async () => {
+		await expect(
+			fingerprintRequest({ method: "POST", path: "/a", body: 5 as never }),
+		).rejects.toThrow(TypeError);
+	});
+
 	it("rejects a method that is not an HTTP token", async () => {
 		await expect(fingerprintRequest({ method: "PO ST", path: "/a" })).rejects.toThrow(TypeError);
 	});

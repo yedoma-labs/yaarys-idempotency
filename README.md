@@ -1,7 +1,21 @@
 # @yedoma-labs/yaarys-idempotency
 
-Framework-agnostic idempotency keys for `POST` requests. A client retry (timeout, double click,
-network drop) must not create a second payment or order.
+<picture>
+  <source media="(max-width: 640px)" srcset="https://raw.githubusercontent.com/yedoma-labs/assets/main/resized/banner-resized-mobile.png">
+  <img src="https://raw.githubusercontent.com/yedoma-labs/assets/main/resized/banner-resized.png" alt="Project Header">
+</picture>
+
+[![CI](https://github.com/yedoma-labs/yaarys-idempotency/actions/workflows/ci.yml/badge.svg)](https://github.com/yedoma-labs/yaarys-idempotency/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/@yedoma-labs/yaarys-idempotency.svg)](https://www.npmjs.com/package/@yedoma-labs/yaarys-idempotency)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6-blue.svg)](https://www.typescriptlang.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+> **яарыс** (*yaarys*) — Yakutian (Sakha) for "(noch zu bestätigen)"
+
+Framework-agnostic idempotency keys for `POST` requests with pluggable stores, in-flight locking
+and clear errors.
+
+A client retry (timeout, double click, network drop) must not create a second payment or order.
 
 ## The problem
 
@@ -175,6 +189,12 @@ Include the query string in `path` (Express: `req.originalUrl`, Hono: `new URL(c
   unique keys, for example by prefixing the user ID in your own code, and never log full keys.
 - Use the same key only for the same operation. Reusing a key for a different request is an error
   by design.
+
+## Request fingerprint
+
+`fingerprintRequest({ method, path, body })` returns a SHA-256 hex digest of the method, path and
+body. Headers are not included. The body can be a `string`, `Uint8Array`, `ArrayBuffer` or another
+binary view, and is hashed by its bytes. Any other body type throws a `TypeError`.
 
 ## Store interface
 
