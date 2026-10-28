@@ -10,8 +10,6 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-6-blue.svg)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> **яарыс** (*yaarys*) — Yakutian (Sakha) for "(noch zu bestätigen)"
-
 Framework-agnostic idempotency keys for `POST` requests with pluggable stores, in-flight locking
 and clear errors.
 
